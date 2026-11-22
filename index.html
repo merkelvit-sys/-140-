@@ -1,0 +1,1354 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Речь № 140 — Кто такой Иисус Христос? (с таймером)</title>
+<style>
+  :root {
+    --bg: #f6f4ef;
+    --surface: #ffffff;
+    --surface-soft: #f0ede6;
+    --text: #1f2428;
+    --text-muted: #5b6470;
+    --border: #dfd9cc;
+    --accent: #2c5282;
+    --accent-soft: #ebf3fc;
+    --verse-bg: #fdf8ec;
+    --verse-border: #c5922b;
+    --cue-bg: #eef4f8;
+    --cue-border: #3a6ea5;
+    --hide-bg: #f4f5f7;
+    --hide-text: #59636e;
+    --timer-bg: #16222f;
+    --timer-text: #f8fafc;
+    --status-ok: #10b981;
+    --status-warn: #f59e0b;
+    --status-urgent: #f97316;
+    --status-over: #ef4444;
+    --font-size: 19px;
+    --shadow: 0 4px 18px rgba(15, 23, 42, 0.06);
+  }
+
+  body.dark {
+    --bg: #11161d;
+    --surface: #1a212b;
+    --surface-soft: #222b38;
+    --text: #e8edf2;
+    --text-muted: #9aa7b8;
+    --border: #2c3747;
+    --accent: #6aa5e8;
+    --accent-soft: #1d2d42;
+    --verse-bg: #272216;
+    --verse-border: #d4a13c;
+    --cue-bg: #1a2636;
+    --cue-border: #558cc9;
+    --hide-bg: #1f2733;
+    --hide-text: #9aa7b8;
+    --timer-bg: #0b1017;
+    --timer-text: #f8fafc;
+    --shadow: 0 6px 24px rgba(0, 0, 0, 0.35);
+  }
+
+  * { box-sizing: border-box; }
+
+  html {
+    scroll-behavior: smooth;
+    scroll-padding-top: 145px;
+  }
+
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    font-size: var(--font-size);
+    line-height: 1.72;
+    transition: background 0.2s, color 0.2s;
+  }
+
+  /* Warning banner shown ONLY if JS is disabled/blocked */
+  .js-warning {
+    background: #fef3c7;
+    color: #92400e;
+    border-bottom: 2px solid #f59e0b;
+    padding: 12px 16px;
+    font-size: 15px;
+    line-height: 1.45;
+    text-align: center;
+  }
+  .js-warning strong { color: #78350f; }
+
+  /* ===== STICKY TIMER BAR ===== */
+  .timer-bar {
+    position: -webkit-sticky;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    background: var(--timer-bg);
+    color: var(--timer-text);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+  }
+
+  .timer-inner {
+    max-width: 980px;
+    margin: 0 auto;
+    padding: 10px 16px 8px;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px 16px;
+  }
+
+  .timer-readout {
+    display: flex;
+    align-items: baseline;
+    gap: 14px;
+    flex-wrap: wrap;
+  }
+
+  .countdown-wrap {
+    display: flex;
+    flex-direction: column;
+    line-height: 1.1;
+  }
+
+  .countdown-label {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: #94a3b8;
+  }
+
+  .countdown-value {
+    font-variant-numeric: tabular-nums;
+    font-size: 34px;
+    font-weight: 800;
+    letter-spacing: 0.02em;
+    color: var(--status-ok);
+    transition: color 0.25s;
+  }
+
+  .countdown-value.warn { color: var(--status-warn); }
+  .countdown-value.urgent { color: var(--status-urgent); }
+  .countdown-value.over {
+    color: var(--status-over);
+    animation: pulse-over 1.2s ease-in-out infinite;
+  }
+
+  @keyframes pulse-over {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.55; }
+  }
+
+  .timer-meta {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    font-size: 13px;
+    color: #cbd5e1;
+    line-height: 1.3;
+  }
+
+  .timer-meta strong {
+    color: #ffffff;
+    font-weight: 600;
+  }
+
+  .timer-controls {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-wrap: wrap;
+  }
+
+  .btn {
+    border: 1px solid rgba(255,255,255,0.18);
+    background: rgba(255,255,255,0.09);
+    color: #f8fafc;
+    border-radius: 8px;
+    padding: 7px 12px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    transition: background 0.15s, transform 0.08s;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .btn:hover { background: rgba(255,255,255,0.18); }
+  .btn:active { transform: scale(0.97); }
+
+  .btn-primary {
+    background: #10b981;
+    border-color: #10b981;
+    color: #062119;
+    padding: 7px 16px;
+  }
+  .btn-primary:hover { background: #34d399; border-color: #34d399; }
+
+  .btn-pause {
+    background: #f59e0b;
+    border-color: #f59e0b;
+    color: #1f1402;
+    padding: 7px 16px;
+  }
+  .btn-pause:hover { background: #fbbf24; border-color: #fbbf24; }
+
+  .btn-danger {
+    background: #ef4444;
+    border-color: #ef4444;
+    color: #ffffff;
+  }
+
+  .btn-icon {
+    padding: 7px 10px;
+    font-size: 13px;
+  }
+
+  .divider-v {
+    width: 1px;
+    height: 22px;
+    background: rgba(255,255,255,0.15);
+    margin: 0 2px;
+  }
+
+  /* Segmented Progress Bar */
+  .progress-track {
+    max-width: 980px;
+    margin: 0 auto;
+    padding: 0 16px 8px;
+  }
+
+  .segments {
+    position: relative;
+    display: flex;
+    height: 10px;
+    border-radius: 6px;
+    overflow: hidden;
+    background: rgba(255,255,255,0.12);
+    gap: 2px;
+  }
+
+  .seg {
+    position: relative;
+    height: 100%;
+    background: rgba(255,255,255,0.10);
+    overflow: hidden;
+    cursor: pointer;
+  }
+
+  .seg-fill {
+    height: 100%;
+    width: 0%;
+    background: var(--status-ok);
+    transition: width 0.3s linear, background 0.3s;
+  }
+
+  .seg-fill.warn { background: var(--status-warn); }
+  .seg-fill.urgent { background: var(--status-urgent); }
+  .seg-fill.over { background: var(--status-over); }
+
+  .seg-nav {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 5px;
+    gap: 4px;
+    flex-wrap: wrap;
+  }
+
+  .nav-pill {
+    font-size: 12px;
+    color: #cbd5e1;
+    text-decoration: none;
+    padding: 2px 8px;
+    border-radius: 999px;
+    background: rgba(255,255,255,0.06);
+    border: 1px solid transparent;
+    transition: all 0.15s;
+  }
+
+  .nav-pill:hover {
+    background: rgba(255,255,255,0.15);
+    color: #fff;
+  }
+
+  .nav-pill.active-pace {
+    background: rgba(16, 185, 129, 0.22);
+    border-color: rgba(16, 185, 129, 0.65);
+    color: #a7f3d0;
+    font-weight: 600;
+  }
+
+  /* ===== MAIN CONTAINER ===== */
+  .container {
+    max-width: 860px;
+    margin: 24px auto 64px;
+    padding: 0 18px;
+  }
+
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 28px 32px;
+    margin-bottom: 24px;
+    box-shadow: var(--shadow);
+  }
+
+  .doc-kicker {
+    font-size: 0.78em;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--accent);
+    font-weight: 700;
+    margin-bottom: 6px;
+  }
+
+  .doc-title {
+    margin: 0 0 10px;
+    font-size: 1.85em;
+    line-height: 1.2;
+    color: var(--text);
+  }
+
+  .doc-note {
+    background: var(--surface-soft);
+    border-left: 4px solid var(--accent);
+    border-radius: 0 8px 8px 0;
+    padding: 12px 16px;
+    font-size: 0.88em;
+    color: var(--text-muted);
+    margin: 14px 0 18px;
+  }
+
+  .doc-note strong { color: var(--text); }
+
+  details.overview-toggle {
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 10px 14px;
+    background: var(--surface-soft);
+  }
+
+  details.overview-toggle summary {
+    cursor: pointer;
+    font-weight: 700;
+    font-size: 0.9em;
+    color: var(--accent);
+    user-select: none;
+  }
+
+  .summary-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 12px;
+    font-size: 0.82em;
+  }
+
+  .summary-table th, .summary-table td {
+    border: 1px solid var(--border);
+    padding: 8px 10px;
+    text-align: left;
+  }
+
+  .summary-table th {
+    background: var(--surface);
+    font-weight: 700;
+  }
+
+  /* ===== PART SECTIONS ===== */
+  .part-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 26px 32px 30px;
+    margin-bottom: 26px;
+    box-shadow: var(--shadow);
+    transition: border-color 0.25s;
+  }
+
+  .part-card.current-pace {
+    border-color: var(--status-ok);
+    box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.16), var(--shadow);
+  }
+
+  .part-header {
+    border-bottom: 2px solid var(--border);
+    padding-bottom: 14px;
+    margin-bottom: 20px;
+  }
+
+  .part-badges {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 8px;
+    font-size: 0.76em;
+  }
+
+  .badge {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 999px;
+    font-weight: 700;
+  }
+
+  .badge-part {
+    background: var(--accent-soft);
+    color: var(--accent);
+  }
+
+  .badge-time {
+    background: var(--surface-soft);
+    color: var(--text-muted);
+    border: 1px solid var(--border);
+  }
+
+  .badge-left {
+    background: rgba(16, 185, 129, 0.12);
+    color: #0f766e;
+  }
+  body.dark .badge-left {
+    background: rgba(16, 185, 129, 0.2);
+    color: #6ee7b7;
+  }
+
+  .part-title {
+    margin: 0;
+    font-size: 1.35em;
+    line-height: 1.3;
+    color: var(--text);
+  }
+
+  p {
+    margin: 0 0 1em;
+  }
+
+  .ref {
+    font-weight: 700;
+    color: var(--accent);
+  }
+
+  /* ===== SCRIPTURE CALLOUT (READ ALOUD) ===== */
+  .verse-box {
+    background: var(--verse-bg);
+    border-left: 5px solid var(--verse-border);
+    border-radius: 0 10px 10px 0;
+    padding: 16px 20px;
+    margin: 18px 0;
+  }
+
+  .verse-tag {
+    display: inline-block;
+    font-size: 0.74em;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: #9a6700;
+    margin-bottom: 6px;
+  }
+  body.dark .verse-tag { color: #f0be58; }
+
+  .verse-text {
+    font-style: italic;
+    font-size: 1.02em;
+    margin: 0;
+    color: var(--text);
+  }
+
+  /* ===== SLIDE CUES & IMAGES ===== */
+  .slide-cue {
+    background: var(--cue-bg);
+    border: 1px solid var(--cue-border);
+    border-left: 5px solid var(--cue-border);
+    border-radius: 10px;
+    padding: 14px 16px;
+    margin: 20px 0;
+  }
+
+  .slide-cue-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 10px;
+    font-size: 0.84em;
+  }
+
+  .slide-cue-label {
+    font-weight: 800;
+    color: var(--accent);
+    letter-spacing: 0.03em;
+  }
+
+  .slide-cue-time {
+    font-size: 0.9em;
+    color: var(--text-muted);
+    font-weight: 600;
+  }
+
+  .slide-img-wrap {
+    position: relative;
+    cursor: zoom-in;
+    border-radius: 8px;
+    overflow: hidden;
+    border: 1px solid var(--border);
+    background: #000;
+  }
+
+  .slide-img-wrap img {
+    display: block;
+    width: 100%;
+    height: auto;
+    max-height: 360px;
+    object-fit: contain;
+    margin: 0 auto;
+    background: #111;
+    transition: transform 0.2s;
+  }
+
+  .slide-img-wrap:hover img {
+    transform: scale(1.01);
+  }
+
+  .zoom-hint {
+    position: absolute;
+    right: 10px;
+    bottom: 10px;
+    background: rgba(15, 23, 42, 0.78);
+    color: #fff;
+    font-size: 12px;
+    padding: 4px 9px;
+    border-radius: 6px;
+    pointer-events: none;
+  }
+
+  .slide-hide {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: var(--hide-bg);
+    color: var(--hide-text);
+    border: 1px dashed var(--border);
+    border-radius: 8px;
+    padding: 5px 12px;
+    font-size: 0.78em;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    margin: 4px 0 16px;
+  }
+
+  /* Prophecy Slide Card */
+  .prophecy-slide {
+    background: linear-gradient(135deg, #1b2a41 0%, #243b55 100%);
+    color: #f8fafc;
+    border-radius: 10px;
+    padding: 18px 20px;
+    cursor: zoom-in;
+    position: relative;
+  }
+
+  .prophecy-slide h4 {
+    margin: 0 0 12px;
+    text-align: center;
+    font-size: 1.05em;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #f6d365;
+  }
+
+  .prophecy-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.85em;
+  }
+
+  .prophecy-table th, .prophecy-table td {
+    border: 1px solid rgba(255,255,255,0.18);
+    padding: 8px 10px;
+    text-align: left;
+  }
+
+  .prophecy-table th {
+    background: rgba(255,255,255,0.12);
+    color: #fde68a;
+    font-weight: 700;
+  }
+
+  .prophecy-table tr:nth-child(even) td {
+    background: rgba(255,255,255,0.04);
+  }
+
+  .bullet-list {
+    margin: 10px 0 18px;
+    padding-left: 22px;
+  }
+
+  .bullet-list li {
+    margin-bottom: 0.55em;
+  }
+
+  /* ===== LIGHTBOX MODAL ===== */
+  .lightbox {
+    position: fixed;
+    inset: 0;
+    z-index: 2000;
+    background: rgba(5, 10, 18, 0.94);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    cursor: zoom-out;
+  }
+
+  .lightbox.open {
+    display: flex;
+  }
+
+  .lightbox-content {
+    max-width: 96vw;
+    max-height: 92vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .lightbox-content img {
+    max-width: 94vw;
+    max-height: 84vh;
+    border-radius: 8px;
+    box-shadow: 0 12px 40px rgba(0,0,0,0.6);
+  }
+
+  .lightbox-caption {
+    color: #e2e8f0;
+    font-size: 15px;
+    text-align: center;
+  }
+
+  .lightbox-close {
+    position: fixed;
+    top: 16px;
+    right: 20px;
+    background: rgba(255,255,255,0.14);
+    color: #fff;
+    border: none;
+    border-radius: 999px;
+    width: 42px;
+    height: 42px;
+    font-size: 22px;
+    cursor: pointer;
+  }
+
+  body.compact-images .slide-img-wrap img {
+    max-height: 120px;
+  }
+
+  @media (max-width: 680px) {
+    .card, .part-card { padding: 20px 18px; }
+    .countdown-value { font-size: 28px; }
+    .timer-inner { padding: 8px 12px 6px; }
+    .progress-track { padding: 0 12px 6px; }
+  }
+
+  @media print {
+    .timer-bar, .lightbox, .zoom-hint, .js-warning { display: none !important; }
+    body { background: #fff; color: #000; font-size: 13pt; }
+    .card, .part-card { box-shadow: none; border: 1px solid #ccc; break-inside: avoid-page; }
+    .slide-cue { break-inside: avoid; }
+  }
+</style>
+</head>
+<body>
+
+<div class="js-warning" id="jsWarning">
+  <strong>Внимание:</strong> JavaScript сейчас отключён (так бывает в быстром предпросмотре файлов на iPad / Android или в Google Диске).
+  Чтобы таймер и кнопки работали, <strong>скачайте файл и откройте его в браузере</strong> (Chrome, Edge, Safari или Firefox).
+</div>
+
+<!-- STICKY TIMER BAR -->
+<header class="timer-bar" role="region" aria-label="Таймер выступления">
+  <div class="timer-inner">
+    <div class="timer-readout">
+      <div class="countdown-wrap">
+        <span class="countdown-label" id="countdownLabel">Осталось</span>
+        <span class="countdown-value" id="countdownDisplay">30:00</span>
+      </div>
+      <div class="timer-meta">
+        <div>Прошло: <strong id="elapsedDisplay">00:00</strong> из 30:00</div>
+        <div id="sectionStatus">По графику: <strong>Часть 1</strong> (ост. в части: 04:00)</div>
+      </div>
+    </div>
+
+    <div class="timer-controls">
+      <button type="button" class="btn btn-primary" id="startPauseBtn" onclick="toggleTimer()" title="Старт / Пауза (Пробел)">▶ Старт</button>
+      <button type="button" class="btn" id="resetBtn" onclick="handleResetClick()" title="Сбросить таймер на 30:00">↺ Сброс</button>
+      <button type="button" class="btn btn-icon" id="minusMinBtn" onclick="adjustMinutes(1)" title="Уменьшить остаток на 1 минуту">−1м</button>
+      <button type="button" class="btn btn-icon" id="plusMinBtn" onclick="adjustMinutes(-1)" title="Добавить 1 минуту">+1м</button>
+      <span class="divider-v"></span>
+      <button type="button" class="btn btn-icon" id="fontDownBtn" onclick="changeFont(-2)" title="Уменьшить шрифт">A−</button>
+      <button type="button" class="btn btn-icon" id="fontUpBtn" onclick="changeFont(2)" title="Увеличить шрифт">A+</button>
+      <button type="button" class="btn btn-icon" id="compactBtn" onclick="toggleCompact()" title="Компактные / крупные слайды">🖼</button>
+      <button type="button" class="btn btn-icon" id="themeBtn" onclick="toggleTheme()" title="Переключить светлую/тёмную тему">🌙</button>
+    </div>
+  </div>
+
+  <div class="progress-track">
+    <div class="segments" title="Прогресс по 4 частям речи (4 / 12 / 9 / 5 мин)">
+      <div class="seg" style="flex: 4;" onclick="scrollToPart('part1')" title="Часть 1: 4 мин (00:00–04:00)"><div class="seg-fill" id="segFill0"></div></div>
+      <div class="seg" style="flex: 12;" onclick="scrollToPart('part2')" title="Часть 2: 12 мин (04:00–16:00)"><div class="seg-fill" id="segFill1"></div></div>
+      <div class="seg" style="flex: 9;" onclick="scrollToPart('part3')" title="Часть 3: 9 мин (16:00–25:00)"><div class="seg-fill" id="segFill2"></div></div>
+      <div class="seg" style="flex: 5;" onclick="scrollToPart('part4')" title="Часть 4: 5 мин (25:00–30:00)"><div class="seg-fill" id="segFill3"></div></div>
+    </div>
+    <nav class="seg-nav" aria-label="Быстрый переход по частям">
+      <a href="#part1" class="nav-pill active-pace" id="pill0">Ч.1 · 4 мин (до 26:00)</a>
+      <a href="#part2" class="nav-pill" id="pill1">Ч.2 · 12 мин (до 14:00)</a>
+      <a href="#part3" class="nav-pill" id="pill2">Ч.3 · 9 мин (до 05:00)</a>
+      <a href="#part4" class="nav-pill" id="pill3">Ч.4 · 5 мин (до 00:00)</a>
+    </nav>
+  </div>
+</header>
+
+<!-- MAIN DOCUMENT -->
+<main class="container">
+
+  <!-- HEADER / OVERVIEW CARD -->
+  <section class="card">
+    <div class="doc-kicker">Публичная речь № 140 · 30 минут</div>
+    <h1 class="doc-title">Кто такой Иисус Христос?</h1>
+
+    <div class="doc-note">
+      <strong>Примечание для докладчика:</strong> Обрати внимание слушателей на то, что Иисус играет главную роль в исполнении Божьего замысла. Тактично упомяни, какие ошибочные представления об Иисусе Христе распространены в вашей местности.
+    </div>
+
+    <details class="overview-toggle">
+      <summary>Сводный план речи, контрольные точки таймера и расписание слайдов (7 шт.)</summary>
+      <table class="summary-table">
+        <thead>
+          <tr>
+            <th>Раздел</th>
+            <th>Длит.</th>
+            <th>Остаток к концу</th>
+            <th>Зачитать</th>
+            <th>Иллюстрации</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>1. Многие не знают, кто такой Иисус...</strong></td>
+            <td>4 мин</td>
+            <td><strong>26:00</strong></td>
+            <td>Мф 16:13, 14</td>
+            <td>№ 1 (титульный слайд)</td>
+          </tr>
+          <tr>
+            <td><strong>2. Истина об Иисусе Христе</strong></td>
+            <td>12 мин</td>
+            <td><strong>14:00</strong></td>
+            <td>Мф 16:15, 16</td>
+            <td>№ 2 (прокажённый), № 3 (таблица пророчеств)</td>
+          </tr>
+          <tr>
+            <td><strong>3. Иисус Христос — самый лучший правитель</strong></td>
+            <td>9 мин</td>
+            <td><strong>05:00</strong></td>
+            <td>—</td>
+            <td>№ 4 (буря), № 5 (обновлённая земля), № 6 (пожар)</td>
+          </tr>
+          <tr>
+            <td><strong>4. Узнайте, кто Иисус на самом деле</strong></td>
+            <td>5 мин</td>
+            <td><strong>00:00</strong></td>
+            <td>Мф 16:17</td>
+            <td>№ 7 (небесный Царь)</td>
+          </tr>
+        </tbody>
+      </table>
+    </details>
+  </section>
+
+  <!-- PART 1 -->
+  <article class="part-card current-pace" id="part1">
+    <div class="part-header">
+      <div class="part-badges">
+        <span class="badge badge-part">Часть 1 из 4</span>
+        <span class="badge badge-time">4 мин · 00:00–04:00</span>
+        <span class="badge badge-left">Остаток к концу части: 26:00</span>
+      </div>
+      <h2 class="part-title">Многие не знают, кто такой Иисус Христос на самом деле</h2>
+    </div>
+
+    <div class="slide-cue">
+      <div class="slide-cue-header">
+        <span class="slide-cue-label">▶ ПОКАЗАТЬ ИЛЛЮСТРАЦИЮ № 1</span>
+        <span class="slide-cue-time">00:00 · Титульный слайд (на вступление)</span>
+      </div>
+      <div class="slide-img-wrap" onclick="openLightboxImg(this, 'Иллюстрация № 1 — Кто такой Иисус Христос?')">
+        <img src="images/slide1.jpg" alt="Кто такой Иисус Христос? Силуэт на пергаменте">
+        <span class="zoom-hint">Нажмите, чтобы увеличить</span>
+      </div>
+    </div>
+
+    <p>Если бы мы вышли на улицу и спросили людей: «Слышали ли вы об Иисусе?» или «Кто такой Иисус Христос?» — мы наверняка услышали бы множество самых разных мнений.</p>
+
+    <p>Всего за три с половиной года своего служения на земле Иисус оставил глубокий след в сердцах людей. Начав с небольшой группы учеников, он изменил ход истории: сегодня христианами себя называют более двух миллиардов человек. Даже те, кто не считает себя христианами, признают, что учение Иисуса оказало огромное влияние на человечество, а предполагаемый год его рождения стал точкой отсчёта новой эры, принятой по всему миру.</p>
+
+    <p>Само существование Иисуса Христа почти никто не оспаривает — даже среди учёных, привыкших всё ставить под сомнение. Когда физика-теоретика Альберта Эйнштейна спросили, считает ли он Иисуса исторической личностью, он ответил: <em>«Ну разумеется! Читая Евангелия, невозможно не почувствовать реальное присутствие Иисуса, его личность дышит в каждом слове, никакой миф не обладает столь мощной жизненной силой»</em>.</p>
+
+    <div class="slide-hide">■ УБРАТЬ ИЛЛЮСТРАЦИЮ № 1 С ЭКРАНА (перед чтением Библии)</div>
+
+    <p>Однако, хотя большинство не сомневается, что Иисус жил, ясного понимания того, кем он был на самом деле, у людей до сих пор нет. Так было и в первом веке, когда сам Иисус ходил по земле. Давайте откроем и прочитаем <span class="ref">Матфея 16:13, 14</span>:</p>
+
+    <div class="verse-box">
+      <div class="verse-tag">Зачитать · Матфея 16:13, 14</div>
+      <p class="verse-text">«Когда Иисус пришёл в окрестности Кесарии Филипповой, он спросил учеников: „Что люди говорят о Сыне человеческом? Кем они его считают?“ Они сказали: „Одни говорят, что он Иоанн Креститель, другие — Илья, третьи — Иеремия или один из пророков“».</p>
+    </div>
+
+    <p>Как видно, люди того времени не говорили об Иисусе ничего плохого — они сравнивали его с великими пророками и признавали, что он особенный человек. И всё же большинство за ним не пошло, потому что он не оправдал их ожиданий. Одни ждали от него роли политического деятеля и земного царя, другие хотели, чтобы он стал их судьёй, а третьих привлекала лишь возможность получить бесплатную пищу и увидеть зрелищные чудеса.</p>
+
+    <p>И сегодня у многих неверное представление об Иисусе. Одни считают его просто хорошим человеком, мудрым учителем или символом рождественских праздников, другие — пророком или социальным реформатором. А миллионы тех, кто называет себя христианами, верят, что он сам — Бог.</p>
+
+    <p>Но Библия — единственный надёжный источник, который даёт точные ответы. Что же в ней говорится о том, <strong>кто такой Иисус Христос, почему он пришёл на землю и что он делает сейчас?</strong></p>
+  </article>
+
+  <!-- PART 2 -->
+  <article class="part-card" id="part2">
+    <div class="part-header">
+      <div class="part-badges">
+        <span class="badge badge-part">Часть 2 из 4</span>
+        <span class="badge badge-time">12 мин · 04:00–16:00</span>
+        <span class="badge badge-left">Остаток к концу части: 14:00</span>
+      </div>
+      <h2 class="part-title">Истина об Иисусе Христе</h2>
+    </div>
+
+    <p>Чтобы приблизиться к истине, обратимся к Евангелиям. Ученики Иисуса под руководством святого духа оставили достоверный и живой рассказ о его личности, учениях и делах — рассказ, который убедительно доказывает: Иисус не был обычным человеком. В Библии описана даже реакция его слушателей: в <span class="ref">Матфея 7:28, 29</span> мы читаем, что люди были поражены его учением.</p>
+
+    <p>Читая Евангелия, мы видим, что Иисус воплощал в себе качества, которые ценят люди во всём мире. Он глубоко сострадал больным, хотя сам обладал совершенным здоровьем. В отличие от книжников и фарисеев, чьи сердца очерствели, Иисус не отказывал людям в помощи даже в субботу. Он был открыт и доступен каждому — к нему тянулись и дети, и пожилые.</p>
+
+    <div class="slide-cue">
+      <div class="slide-cue-header">
+        <span class="slide-cue-label">▶ ПОКАЗАТЬ ИЛЛЮСТРАЦИЮ № 2</span>
+        <span class="slide-cue-time">~05:30 · Иисус прикасается к прокажённому и исцеляет его</span>
+      </div>
+      <div class="slide-img-wrap" onclick="openLightboxImg(this, 'Иллюстрация № 2 — Иисус исцеляет прокажённого (Матфея 8:2, 3)')">
+        <img src="images/slide2.jpg" alt="Иисус прикасается к прокажённому и исцеляет его">
+        <span class="zoom-hint">Нажмите, чтобы увеличить</span>
+      </div>
+    </div>
+
+    <p>Однажды к нему подошёл прокажённый, которому закон запрещал приближаться к людям. Иисус не осудил его, а увидел его боль. В <span class="ref">Матфея 8:2, 3</span> записано: <em>«„Господин, если ты только захочешь, ты сможешь меня очистить“. Протянув руку, Иисус прикоснулся к нему и сказал: „Хочу! Очистись!“ И тотчас же он очистился от проказы»</em>.</p>
+
+    <div class="slide-hide">■ УБРАТЬ ИЛЛЮСТРАЦИЮ № 2 С ЭКРАНА</div>
+
+    <p>Иисус трудился ради людей, даже когда сильно уставал. Утомлённый жарой и долгой дорогой, он присел у колодца и всё равно завёл важный разговор с самаритянкой. Он проявлял рвение, рассказывая людям об Отце, несмотря на их равнодушие. А в последнюю ночь своей земной жизни он подал непревзойдённый пример смирения, вымыв ноги своим ученикам.</p>
+
+    <p>Кроме того, Иисус учил людей, как приближаться к Богу. В 6-й главе Евангелия от Матфея он оставил прекрасный образец молитвы, известный как «Отче наш». Это не просто заученные слова — она помогает правильно расставить приоритеты, показывая, что на первом месте всегда должны стоять святость Божьего имени и приход Его Царства. Иисус открыл нам сердце Отца и помог почувствовать, насколько Иегова близок и как сильно он нас любит. В Евангелиях мы видим, с какой радостью и одобрением Иегова отзывался о своём Сыне — это заверяет нас, что, радуя Бога, мы тоже обретаем его любовь.</p>
+
+    <p>Ещё одно веское доказательство того, что Иисус был не просто человеком, — многочисленные пророчества, записанные за столетия до его рождения.</p>
+
+    <div class="slide-cue">
+      <div class="slide-cue-header">
+        <span class="slide-cue-label">▶ ПОКАЗАТЬ ИЛЛЮСТРАЦИЮ № 3 (ТАБЛИЦА)</span>
+        <span class="slide-cue-time">~08:30 · Пророчества о Мессии (исправлено: Исаия 53:9)</span>
+      </div>
+      <div class="prophecy-slide" id="prophecySlideCard" onclick="openLightboxHtml(this, 'Иллюстрация № 3 — Пророчества о Мессии')">
+        <h4>Пророчества о Мессии</h4>
+        <table class="prophecy-table">
+          <thead>
+            <tr>
+              <th>Событие</th>
+              <th>Пророчество</th>
+              <th>Исполнение</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Потомок царя Давида</td>
+              <td>Исаия 9:7</td>
+              <td>Матфея 1:1, 6–17</td>
+            </tr>
+            <tr>
+              <td>Родится от девственницы</td>
+              <td>Исаия 7:14</td>
+              <td>Матфея 1:18–25</td>
+            </tr>
+            <tr>
+              <td>Предан за 30 серебряных монет</td>
+              <td>Захария 11:12</td>
+              <td>Матфея 26:14–16</td>
+            </tr>
+            <tr>
+              <td>Подвергнется насмешкам</td>
+              <td>Псалом 22:7, 8</td>
+              <td>Матфея 27:39–43</td>
+            </tr>
+            <tr>
+              <td>Похоронен у богатого</td>
+              <td><strong>Исаия 53:9</strong></td>
+              <td>Матфея 27:57</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <p>На слайде мы видим лишь несколько примеров таких пророчеств и их точного исполнения:</p>
+    <ul class="bullet-list">
+      <li>Пророк Исаия предсказал, что Мессия произойдёт из рода царя Давида и родится от девственницы (<span class="ref">Исаия 7:14; 9:7</span>).</li>
+      <li>Захария указал, что его предадут ровно за тридцать серебряных монет (<span class="ref">Захария 11:12</span>).</li>
+      <li>Псалмопевец и Исаия за сотни лет описали даже детали его казни и погребения — что над ним будут насмехаться и что он будет похоронен у богатого (<span class="ref">Псалом 22:7, 8; Исаия 53:9</span>).</li>
+    </ul>
+
+    <p>Все эти пророчества с точностью исполнились на Иисусе.</p>
+
+    <div class="slide-hide">■ УБРАТЬ ИЛЛЮСТРАЦИЮ № 3 С ЭКРАНА (перед чтением Библии)</div>
+
+    <p>Что ещё мы узнаём из Писания об Иисусе? Он никогда не называл себя Богом и не ставил себя на место Отца. И первые ученики тоже не считали его Богом. Кем же они его считали? Давайте снова посмотрим на 16-ю главу Евангелия от Матфея и прочитаем <span class="ref">стихи 15 и 16</span>:</p>
+
+    <div class="verse-box">
+      <div class="verse-tag">Зачитать · Матфея 16:15, 16</div>
+      <p class="verse-text">«Тогда он спросил их: „А вы как считаете, кто я?“ Симон Пётр ответил: „Ты — Христос, Сын живого Бога“».</p>
+    </div>
+
+    <p>Сегодня, слушая сложные объяснения о Троице, многие запутываются и слышат в ответ: «Это тайна, её невозможно понять». Но Иисус никогда не запутывал людей — он говорил просто и ясно. Всякий раз, уча людей или совершая могущественные чудеса, он воздавал всю славу Богу. В <span class="ref">Иоанна 7:16</span> он прямо сказал: <em>«То, чему я учу, — не моё, а того, кто меня послал»</em>. А в <span class="ref">Иоанна 14:10</span> добавил: <em>«То, что я говорю вам, я говорю не от себя; это Отец, который в единстве со мной, исполняет свои дела»</em>. Возвращая зрение слепым и воскрешая мёртвых, Иисус не привлекал внимание к себе — он указывал на своего Отца.</p>
+
+    <p>Откуда же Иисус так глубоко знал Бога? Ответ даёт сама Библия: до прихода на землю Иисус жил на небесах. В <span class="ref">Иоанна 6:38</span> он говорит: <em>«Я сошёл с неба»</em>. А в <span class="ref">Колоссянам 1:15, 16</span> о нём сказано, что он — <em>«образ невидимого Бога, первенец из всего творения»</em>, и всё остальное было создано через него. Иисус был первым и единственным, кого Бог Иегова сотворил непосредственно. Именно поэтому Библия по праву называет его <em>«единородным Сыном Бога»</em> (<span class="ref">Иоанна 3:18</span>). Проведя рядом с Отцом несчётные века, он впитал Его качества и стал точным отражением Божьей личности.</p>
+
+    <p>Зачем же он оставил небо и пришёл на землю? Прежде всего, Бог послал его, чтобы учить истине и проповедовать добрую весть о Царстве Бога (<span class="ref">Матфея 4:17; Иоанна 18:37</span>). Само его имя — Иисус, по-еврейски Иешуа — означает «Иегова спасает». Как обещанный Мессия, или Христос, он пришёл ради нашего спасения. В конце своего земного пути он добровольно отдал свою совершенную жизнь в жертву за человечество. Как записано в <span class="ref">Иоанна 3:16</span>, Бог отдал своего Сына, <em>«чтобы каждый, кто проявляет в него веру, не погиб, но имел вечную жизнь»</em>. Эта жертва открыла перед нами путь к прощению грехов, дружбе с Богом и вечной жизни.</p>
+
+    <p>Но смерть не стала для Иисуса концом. Иегова воскресил его к небесной жизни, посадил по свою правую руку и наделил царской властью (<span class="ref">Деяния 2:32, 33</span>). Сам Иисус подтвердил это в <span class="ref">Матфея 28:18</span>: <em>«Мне дана вся власть на небе и на земле»</em>. Выше него — только сам Бог. Иисус стал Царём царей и получил силу устранить любое зло.</p>
+  </article>
+
+  <!-- PART 3 -->
+  <article class="part-card" id="part3">
+    <div class="part-header">
+      <div class="part-badges">
+        <span class="badge badge-part">Часть 3 из 4</span>
+        <span class="badge badge-time">9 мин · 16:00–25:00</span>
+        <span class="badge badge-left">Остаток к концу части: 05:00</span>
+      </div>
+      <h2 class="part-title">Иисус Христос — самый лучший правитель</h2>
+    </div>
+
+    <p>Сегодня на земле правят люди, и, увы, результаты их правления печальны. Из-за гордости, амбиций и жажды власти вспыхивают войны: только с 1945 года в мире произошло более 300 вооружённых конфликтов. Экология страдает от разрушения, а в то время как в одних странах люди голодают, в других тонны еды выбрасываются на свалку. Ещё мудрый царь Соломон точно подметил в <span class="ref">Экклезиасте 8:9</span>: <em>«Во все времена человек господствует над человеком ему во вред»</em>.</p>
+
+    <p>Человечество остро нуждается в хорошем правительстве. Может ли Иисус стать тем самым идеальным Правителем? Несомненно!</p>
+
+    <p>Прежде всего, он обладает всеми качествами и способностями настоящего руководителя. За ним шли тысячи людей, а сегодня миллионы по всему миру стараются жить по его учениям.</p>
+
+    <div class="slide-cue">
+      <div class="slide-cue-header">
+        <span class="slide-cue-label">▶ ПОКАЗАТЬ ИЛЛЮСТРАЦИЮ № 4</span>
+        <span class="slide-cue-time">~18:00 · Иисус усмиряет бурю на море</span>
+      </div>
+      <div class="slide-img-wrap" onclick="openLightboxImg(this, 'Иллюстрация № 4 — Иисус усмиряет бурю (Марка 4:39)')">
+        <img src="images/slide4.jpg" alt="Иисус усмиряет бурю на Галилейском море">
+        <span class="zoom-hint">Нажмите, чтобы увеличить</span>
+      </div>
+    </div>
+
+    <p>Находясь на земле, он на деле доказал свою силу и власть: он исцелял любые болезни, воскрешал умерших, например своего друга Лазаря, одним словом успокоил свирепую бурю и накормил тысячи голодных людей несколькими хлебами и рыбами (<span class="ref">Марка 4:39; Иоанна 11:43, 44</span>). В нём сочетаются могущество и искренняя забота.</p>
+
+    <div class="slide-hide">■ УБРАТЬ ИЛЛЮСТРАЦИЮ № 4 С ЭКРАНА</div>
+
+    <p>Кроме того, Иисус по-настоящему понимает нас. В отличие от многих правителей, выросших в роскоши и далёких от нужд народа, Иисус сам жил среди простых людей. Он вырос в скромной семье плотника, с юности знал тяжёлый труд и лично прошёл через повседневные человеческие трудности. Он знает, что значит быть одним из нас.</p>
+
+    <p>Увидев его чудеса и заботу, люди в первом веке захотели немедленно сделать его царём (<span class="ref">Иоанна 6:14, 15</span>). Но Иисус отказался. Почему? В <span class="ref">Иоанна 18:36</span> он ясно объяснил: <em>«Моё царство не от этого мира»</em>. Ведь, как говорится в <span class="ref">1 Иоанна 5:19</span>, <em>«весь мир лежит во власти Злого»</em>. Иисус не собирался становиться частью политической системы мира Сатаны. Он не торопил события, а терпеливо ждал времени, назначенного Иеговой. В <span class="ref">Евреям 10:12, 13</span> сказано, что после воскресения он сел по правую руку от Бога и ожидал, <em>«пока его враги не будут положены как подножие для его ног»</em>.</p>
+
+    <p>Библейские пророчества указывают на то, что это время наступило и сегодня Иисус уже правит как Царь в небесном Царстве Бога. Сам Иисус описал признаки нашего времени в <span class="ref">Матфея 24:3–12</span>: <em>«Народ поднимется против народа, и царство против царства, в одном месте за другим будет голод и землетрясения... И из-за роста беззакония во многих охладеет любовь»</em>. Включая сегодня новости, мы каждый день видим исполнение этих слов — войны, стихийные бедствия, равнодушие и жестокость. Всё это подтверждает, что мы живём в особенное, переломное время.</p>
+
+    <div class="slide-cue">
+      <div class="slide-cue-header">
+        <span class="slide-cue-label">▶ ПОКАЗАТЬ ИЛЛЮСТРАЦИЮ № 5</span>
+        <span class="slide-cue-time">~21:30 · Обновлённая земля под правлением Царства</span>
+      </div>
+      <div class="slide-img-wrap" onclick="openLightboxImg(this, 'Иллюстрация № 5 — Мир на обновлённой земле (Откровение 21:3, 4)')">
+        <img src="images/slide5.jpg" alt="Жизнь на обновлённой земле: здоровые семьи, мир с животными">
+        <span class="zoom-hint">Нажмите, чтобы увеличить</span>
+      </div>
+    </div>
+
+    <p>А значит, совсем скоро Иисус совершит в масштабах всей земли ещё более удивительные дела, чем те, которые он совершал в первом веке (<span class="ref">Луки 7:21, 22</span>). Когда Божье Царство установит свою власть на земле, всё разрушенное будет восстановлено. Силой Иеговы навсегда исчезнут болезни и страдания — слова «я болен» или «я инвалид» уйдут в прошлое. Люди и животные будут жить в мире, а умершие близкие вернутся к жизни.</p>
+
+    <p>В <span class="ref">Откровении 21:3, 4</span> записано трогательное обещание: <em>«Шатёр Бога — с людьми... Он отрёт всякую слезу с их глаз, и смерти уже не будет, ни скорби, ни вопля, ни боли уже не будет»</em>. Представьте, как любящий Отец нежно утешает своего ребёнка — именно так Иегова через правление Иисуса принесёт на землю мир и радость.</p>
+
+    <div class="slide-hide">■ УБРАТЬ ИЛЛЮСТРАЦИЮ № 5 С ЭКРАНА</div>
+
+    <p>И уже сейчас людям по всей земле даётся удивительная возможность стать гражданами Божьего Царства (<span class="ref">Матфея 24:14; 28:19, 20</span>). Именно поэтому по всему миру звучит добрая весть об этом Царстве.</p>
+
+    <div class="slide-cue">
+      <div class="slide-cue-header">
+        <span class="slide-cue-label">▶ ПОКАЗАТЬ ИЛЛЮСТРАЦИЮ № 6</span>
+        <span class="slide-cue-time">~23:30 · Наглядный пример: предупреждение о пожаре</span>
+      </div>
+      <div class="slide-img-wrap" onclick="openLightboxImg(this, 'Иллюстрация № 6 — Срочное предупреждение о пожаре')">
+        <img src="images/slide6.jpg" alt="Горящий дом и мужчина, предупреждающий соседа в дверях">
+        <span class="zoom-hint">Нажмите, чтобы увеличить</span>
+      </div>
+    </div>
+
+    <p>Представьте, что в большом жилом доме начался сильный пожар. Огонь быстро распространяется, а многие жильцы спят и не знают об опасности. Если кто-то, уже выбравшись наружу, начнёт стучать в двери и будить людей, поначалу кто-то может недовольно сказать: «Зачем ты шумишь, я отдыхаю!» Но, осознав реальную опасность, человек будет безмерно благодарен за то, что его вовремя предупредили. Точно так же весть о Царстве Христа — это не пустые разговоры, а жизненно важное приглашение, которое может спасти будущее каждого человека.</p>
+
+    <div class="slide-hide">■ УБРАТЬ ИЛЛЮСТРАЦИЮ № 6 С ЭКРАНА (переход к заключению)</div>
+  </article>
+
+  <!-- PART 4 -->
+  <article class="part-card" id="part4">
+    <div class="part-header">
+      <div class="part-badges">
+        <span class="badge badge-part">Часть 4 из 4</span>
+        <span class="badge badge-time">5 мин · 25:00–30:00</span>
+        <span class="badge badge-left">Остаток к концу части: 00:00</span>
+      </div>
+      <h2 class="part-title">Узнайте, кто Иисус на самом деле</h2>
+    </div>
+
+    <p>Сегодня Иегова с любовью открывает нам истину из своего Слова, Библии, помогая понять, какое прекрасное будущее он приготовил и какую главную роль в этом играет его Сын, Иисус Христос. Это не просто сухие знания для ума — это драгоценный дар Бога, который наполняет сердце надеждой.</p>
+
+    <p>Посмотрите, что сказал сам Иисус апостолу Петру, когда тот правильно назвал его Сыном живого Бога. Прочитаем <span class="ref">Матфея 16:17</span>:</p>
+
+    <div class="verse-box">
+      <div class="verse-tag">Зачитать · Матфея 16:17</div>
+      <p class="verse-text">«Иисус сказал ему в ответ: „Счастлив ты, Симон, сын Ионы, потому что не плоть и кровь открыли тебе это, а мой Отец, который на небесах“».</p>
+    </div>
+
+    <p>Какие тёплые слова! Они напоминают, что истина об Иисусе — это личный подарок от нашего Небесного Отца.</p>
+
+    <p>И это знание приносит реальную пользу уже сегодня. Когда мы берём пример с Иисуса и живём так, как он учил, мы обретаем настоящее счастье, внутренний мир и покой (<span class="ref">Матфея 7:24, 25; 11:28–30; 1 Петра 2:21</span>). В мире, полном тревог, страхов и суеты, учения Христа становятся для нашего сердца настоящим духовным противоядием, которое защищает, исцеляет и даёт уверенность в завтрашнем дне.</p>
+
+    <p>Более того, знание истины об Иисусе приносит вечную пользу. В <span class="ref">Иоанна 17:3</span> он сказал в молитве Отцу: <em>«Чтобы иметь вечную жизнь, необходимо приобретать знания о тебе, единственном истинном Боге, и посланном тобой Иисусе Христе»</em>.</p>
+
+    <div class="slide-cue">
+      <div class="slide-cue-header">
+        <span class="slide-cue-label">▶ ПОКАЗАТЬ ИЛЛЮСТРАЦИЮ № 7</span>
+        <span class="slide-cue-time">~27:30 · Финальный слайд (оставить до конца речи)</span>
+      </div>
+      <div class="slide-img-wrap" onclick="openLightboxImg(this, 'Иллюстрация № 7 — Иисус Христос, небесный Царь (Иоанна 14:6)')">
+        <img src="images/slide7.jpg" alt="Иисус Христос как небесный Царь со скипетром над землёй">
+        <span class="zoom-hint">Нажмите, чтобы увеличить</span>
+      </div>
+    </div>
+
+    <p>Поэтому пусть целью каждого из нас станет узнавать Иисуса всё глубже и идти по пути, который он указал. Сам Иисус произнёс слова, записанные в <span class="ref">Иоанна 14:6</span>: <em>«Я — путь, истина и жизнь. Никто не приходит к Отцу иначе, как только через меня»</em>. Вдумайтесь в эти три слова:</p>
+
+    <ul class="bullet-list">
+      <li><strong>Путь</strong> — потому что только через Иисуса люди могут обращаться к Богу и приближаться к Нему.</li>
+      <li><strong>Истина</strong> — потому что он всегда говорил истину и жил в полном согласии с ней.</li>
+      <li><strong>Жизнь</strong> — потому что, отдав себя в выкуп, он открыл нам возможность обрести истинную, вечную жизнь.</li>
+    </ul>
+
+    <p>Итак, сегодня мы увидели, кем Иисус Христос является на самом деле. Он — реальная историческая личность, изменившая мир, единородный Сын Бога, отдавший за нас жизнь, и наш небесный Царь, который вскоре навсегда покончит со злом, болезнями и смертью.</p>
+
+    <p>Давайте же и дальше с открытым сердцем исследовать его жизнь, учиться у него и подражать его примеру. Ведь чем ближе мы к Иисусу Христу, тем ближе мы к нашему любящему Богу Иегове, который через своего Сына дарит нам настоящую жизнь и светлое будущее.</p>
+  </article>
+
+</main>
+
+<!-- LIGHTBOX FOR FULLSCREEN SLIDE PREVIEW -->
+<div class="lightbox" id="lightbox" onclick="closeLightbox()">
+  <button type="button" class="lightbox-close" onclick="closeLightbox()" aria-label="Закрыть">&times;</button>
+  <div class="lightbox-content" id="lightboxContent" onclick="event.stopPropagation()"></div>
+</div>
+
+<script>
+(function() {
+  // Hide JS-disabled banner immediately
+  var warnBanner = document.getElementById('jsWarning');
+  if (warnBanner) warnBanner.style.display = 'none';
+
+  var TOTAL_SECONDS = 30 * 60;
+  var SECTIONS = [
+    { id: 'part1', name: 'Часть 1', start: 0,       end: 4 * 60  },
+    { id: 'part2', name: 'Часть 2', start: 4 * 60,  end: 16 * 60 },
+    { id: 'part3', name: 'Часть 3', start: 16 * 60, end: 25 * 60 },
+    { id: 'part4', name: 'Часть 4', start: 25 * 60, end: 30 * 60 }
+  ];
+
+  var elapsedSeconds = 0;
+  var isRunning = false;
+  var lastTick = 0;
+  var timerInterval = null;
+  var wakeLock = null;
+  var resetArmed = false;
+  var resetArmTimer = null;
+
+  var countdownDisplay = document.getElementById('countdownDisplay');
+  var countdownLabel = document.getElementById('countdownLabel');
+  var elapsedDisplay = document.getElementById('elapsedDisplay');
+  var sectionStatus = document.getElementById('sectionStatus');
+  var startPauseBtn = document.getElementById('startPauseBtn');
+  var resetBtn = document.getElementById('resetBtn');
+  var themeBtn = document.getElementById('themeBtn');
+  var lightbox = document.getElementById('lightbox');
+  var lightboxContent = document.getElementById('lightboxContent');
+
+  function safeGet(key, fallback) {
+    try {
+      var v = window.localStorage ? window.localStorage.getItem(key) : null;
+      return v !== null ? v : fallback;
+    } catch (e) {
+      return fallback;
+    }
+  }
+
+  function safeSet(key, val) {
+    try {
+      if (window.localStorage) window.localStorage.setItem(key, val);
+    } catch (e) {}
+  }
+
+  function pad2(n) {
+    return n < 10 ? '0' + n : String(n);
+  }
+
+  function fmtTime(sec) {
+    var sign = sec < 0 ? '−' : '';
+    var abs = Math.abs(Math.floor(sec));
+    var m = Math.floor(abs / 60);
+    var s = abs % 60;
+    return sign + pad2(m) + ':' + pad2(s);
+  }
+
+  function requestWakeLock() {
+    try {
+      if (navigator && navigator.wakeLock && navigator.wakeLock.request && !wakeLock) {
+        navigator.wakeLock.request('screen').then(function(lock) {
+          wakeLock = lock;
+          if (wakeLock && wakeLock.addEventListener) {
+            wakeLock.addEventListener('release', function() { wakeLock = null; });
+          }
+        }).catch(function() {});
+      }
+    } catch (e) {}
+  }
+
+  function releaseWakeLock() {
+    try {
+      if (wakeLock && wakeLock.release) {
+        wakeLock.release().catch(function() {});
+        wakeLock = null;
+      }
+    } catch (e) {}
+  }
+
+  function disarmReset() {
+    resetArmed = false;
+    if (resetArmTimer) {
+      clearTimeout(resetArmTimer);
+      resetArmTimer = null;
+    }
+    if (resetBtn) {
+      resetBtn.textContent = '↺ Сброс';
+      resetBtn.className = 'btn';
+    }
+  }
+
+  function updateUI() {
+    var remaining = TOTAL_SECONDS - elapsedSeconds;
+    var isOver = remaining < 0;
+
+    countdownDisplay.textContent = fmtTime(remaining);
+    countdownLabel.textContent = isOver ? 'Перебор времени!' : 'Осталось';
+    elapsedDisplay.textContent = fmtTime(elapsedSeconds);
+
+    var statusClass = '';
+    if (isOver) statusClass = 'over';
+    else if (remaining <= 120) statusClass = 'urgent';
+    else if (remaining <= 300) statusClass = 'warn';
+
+    countdownDisplay.className = 'countdown-value ' + statusClass;
+
+    document.title = isRunning
+      ? fmtTime(remaining) + ' · Речь № 140'
+      : 'Речь № 140 — Кто такой Иисус Христос? (с таймером)';
+
+    var currentIdx = 3;
+    for (var i = 0; i < SECTIONS.length; i++) {
+      if (elapsedSeconds < SECTIONS[i].end) {
+        currentIdx = i;
+        break;
+      }
+    }
+
+    if (isOver) {
+      sectionStatus.innerHTML = '<strong style="color:#f87171;">Время вышло (+' + fmtTime(-remaining) + ')</strong>';
+    } else {
+      var sec = SECTIONS[currentIdx];
+      var secLeft = Math.max(0, sec.end - elapsedSeconds);
+      sectionStatus.innerHTML = 'По графику: <strong>' + sec.name + '</strong> (ост. в части: ' + fmtTime(secLeft) + ')';
+    }
+
+    for (var j = 0; j < SECTIONS.length; j++) {
+      var s = SECTIONS[j];
+      var fill = document.getElementById('segFill' + j);
+      var pill = document.getElementById('pill' + j);
+      var card = document.getElementById(s.id);
+      var dur = s.end - s.start;
+      var pct = Math.max(0, Math.min(100, ((elapsedSeconds - s.start) / dur) * 100));
+
+      if (fill) {
+        fill.style.width = pct + '%';
+        fill.className = 'seg-fill ' + statusClass;
+      }
+      var isActive = !isOver && j === currentIdx;
+      if (pill) pill.classList.toggle('active-pace', isActive);
+      if (card) card.classList.toggle('current-pace', isActive);
+    }
+  }
+
+  function startTimer() {
+    if (isRunning) return;
+    isRunning = true;
+    lastTick = Date.now();
+    startPauseBtn.textContent = '⏸ Пауза';
+    startPauseBtn.className = 'btn btn-pause';
+    requestWakeLock();
+    timerInterval = setInterval(function() {
+      var now = Date.now();
+      var delta = (now - lastTick) / 1000;
+      if (delta >= 0.2) {
+        elapsedSeconds += delta;
+        lastTick = now;
+        updateUI();
+      }
+    }, 250);
+    updateUI();
+  }
+
+  function pauseTimer() {
+    if (!isRunning) return;
+    isRunning = false;
+    clearInterval(timerInterval);
+    timerInterval = null;
+    startPauseBtn.textContent = '▶ Продолжить';
+    startPauseBtn.className = 'btn btn-primary';
+    releaseWakeLock();
+    updateUI();
+  }
+
+  window.toggleTimer = function() {
+    disarmReset();
+    if (isRunning) pauseTimer();
+    else startTimer();
+  };
+
+  window.handleResetClick = function() {
+    if (elapsedSeconds > 10 && !resetArmed) {
+      resetArmed = true;
+      resetBtn.textContent = 'Подтвердить?';
+      resetBtn.className = 'btn btn-danger';
+      resetArmTimer = setTimeout(disarmReset, 3500);
+      return;
+    }
+    disarmReset();
+    pauseTimer();
+    elapsedSeconds = 0;
+    startPauseBtn.textContent = '▶ Старт';
+    startPauseBtn.className = 'btn btn-primary';
+    updateUI();
+  };
+
+  window.adjustMinutes = function(deltaMin) {
+    elapsedSeconds = Math.max(0, elapsedSeconds + deltaMin * 60);
+    updateUI();
+  };
+
+  var fontSize = parseInt(safeGet('speech140_font', '19'), 10);
+  if (isNaN(fontSize)) fontSize = 19;
+
+  function applyFont() {
+    fontSize = Math.max(14, Math.min(30, fontSize));
+    document.documentElement.style.setProperty('--font-size', fontSize + 'px');
+    safeSet('speech140_font', String(fontSize));
+  }
+  applyFont();
+
+  window.changeFont = function(step) {
+    fontSize += step;
+    applyFont();
+  };
+
+  if (safeGet('speech140_dark', '0') === '1') {
+    document.body.classList.add('dark');
+    if (themeBtn) themeBtn.textContent = '☀';
+  }
+
+  window.toggleTheme = function() {
+    var isDark = document.body.classList.toggle('dark');
+    if (themeBtn) themeBtn.textContent = isDark ? '☀' : '🌙';
+    safeSet('speech140_dark', isDark ? '1' : '0');
+  };
+
+  window.toggleCompact = function() {
+    document.body.classList.toggle('compact-images');
+  };
+
+  window.scrollToPart = function(id) {
+    var el = document.getElementById(id);
+    if (el && el.scrollIntoView) el.scrollIntoView({ behavior: 'smooth' });
+  };
+
+  window.openLightboxImg = function(wrap, caption) {
+    var img = wrap.querySelector('img');
+    if (!img) return;
+    lightboxContent.innerHTML = '';
+    var big = document.createElement('img');
+    big.src = img.src;
+    big.alt = caption || '';
+    var cap = document.createElement('div');
+    cap.className = 'lightbox-caption';
+    cap.textContent = caption || '';
+    lightboxContent.appendChild(big);
+    lightboxContent.appendChild(cap);
+    lightbox.classList.add('open');
+  };
+
+  window.openLightboxHtml = function(el, caption) {
+    var clone = el.cloneNode(true);
+    clone.style.cursor = 'default';
+    clone.style.minWidth = 'min(90vw, 760px)';
+    clone.style.fontSize = '20px';
+    clone.onclick = null;
+    lightboxContent.innerHTML = '';
+    lightboxContent.appendChild(clone);
+    var cap = document.createElement('div');
+    cap.className = 'lightbox-caption';
+    cap.textContent = caption || '';
+    lightboxContent.appendChild(cap);
+    lightbox.classList.add('open');
+  };
+
+  window.closeLightbox = function() {
+    lightbox.classList.remove('open');
+  };
+
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+      window.closeLightbox();
+    } else if (e.code === 'Space' || e.key === ' ') {
+      var tag = e.target && e.target.tagName ? e.target.tagName.toUpperCase() : '';
+      if (tag !== 'BUTTON' && tag !== 'SUMMARY' && tag !== 'A' && tag !== 'INPUT') {
+        e.preventDefault();
+        window.toggleTimer();
+      }
+    }
+  });
+
+  document.addEventListener('visibilitychange', function() {
+    if (document.visibilityState === 'visible' && isRunning) requestWakeLock();
+  });
+
+  updateUI();
+})();
+</script>
+</body>
+</html>
